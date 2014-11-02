@@ -4,6 +4,28 @@
   */
 
 #include "HKState.h"
+#include <QVariant>
+
+#define PROPERTY_NAME "hk_state"
+
+/**
+ * @brief ctor
+ * @param parent
+ */
+HKState::HKState(QObject *parent) : QObject(parent)
+{
+    // prepare state storage
+    if ( ! property(PROPERTY_NAME).isValid()) {
+        setProperty(PROPERTY_NAME, QVariant(QString("")));
+    }
+}
+
+/**
+ * @brief dtor
+ */
+HKState::~HKState()
+{
+}
 
 /**
  * @brief setter of freely changable state api
@@ -13,10 +35,10 @@
  */
 void HKState::set(const QString &state)
 {
-    if (m_state == state)
+    if (property(PROPERTY_NAME).toString() == state)
         return;
-    emit changing(m_state, state);
-    m_state = state;
+    emit changing(property(PROPERTY_NAME).toString(), state);
+    setProperty(PROPERTY_NAME, QVariant(state));
     emit changed();
 }
 
@@ -27,7 +49,7 @@ void HKState::set(const QString &state)
  */
 bool HKState::is(const QString &state) const
 {
-    return m_state == state;
+    return property(PROPERTY_NAME).toString() == state;
 }
 
 /**
@@ -36,9 +58,8 @@ bool HKState::is(const QString &state) const
  */
 QString HKState::toString() const
 {
-    return m_state;
+    return property(PROPERTY_NAME).toString();
 }
-
 
 /**
  * @brief the current state with class name
@@ -49,5 +70,5 @@ QString HKState::toDebugString() const
     return QString("%1 %2 = %3;")
             .arg(metaObject()->className())
             .arg(objectName())
-            .arg(m_state);
+            .arg(property(PROPERTY_NAME).toString());
 }

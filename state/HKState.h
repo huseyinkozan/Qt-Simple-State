@@ -22,6 +22,8 @@
  *     Use changed() signal to inform.
  *
  * See AlarmClock example.
+ *
+ * TODO : to property, hierarchy, entering(), exiting(), entered(), exited()
  */
 
 class HKState : public QObject
@@ -29,7 +31,8 @@ class HKState : public QObject
     Q_OBJECT
 
 public:
-    HKState(QObject *parent = 0) : QObject(parent) {}
+    explicit HKState(QObject *parent = 0);
+    virtual ~HKState();
 
     void set(const QString & state);
     bool is(const QString & state) const;
@@ -39,9 +42,6 @@ public:
 signals:
     void changing(const QString & current, const QString & next);
     void changed();
-
-protected:
-    QString m_state;
 };
 
 /**
