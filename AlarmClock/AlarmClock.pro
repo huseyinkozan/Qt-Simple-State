@@ -22,6 +22,7 @@ SOURCES += \
 HEADERS  += \
     MainWindow.h \
     States/Alarm.h \
-    States/Mode.h
+    States/Alarm/Alert.h \
+    States/Mode.h \
 
 FORMS    += MainWindow.ui

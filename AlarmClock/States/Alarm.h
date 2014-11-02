@@ -2,7 +2,8 @@
 #define ALARM_H
 
 #include "HKState.h"
-
+#include "Alarm/Alert.h"
+#include "Mode.h"
 
 /**
  * @brief The Alarm class.
@@ -27,15 +28,27 @@ public slots:
     void setOff() { set("Off"); emit atOff(); }
     void setOn() { set("On"); emit atOn(); }
 
+    // substate
+    Alert * setAlert() { emit atOn(); return getAlert(); /* to chaning */ }
+
 public:
     // checkers to test if state is ...
     bool isOff() const { return is("Off"); }
     bool isOn() const { return is("On"); }
 
+    // substate
+    Alert * getAlert() { return qobject_cast<Alert*>(sub("On")); }
+
 public:
     explicit Alarm(QObject *parent = 0) : HKState(parent) {
+
         // set default state
         setOff();
+
+        // add substate
+        // QObject dtor will delete Alert from memory.
+        // "On" states for aler is only for On state.
+        addSub(new Alert(this), "On");
     }
 };
 

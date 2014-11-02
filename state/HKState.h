@@ -8,6 +8,7 @@
 
 #include <QObject>
 
+
 /**
  * @class HKState
  * @brief The HKState class
@@ -23,7 +24,8 @@
  *
  * See AlarmClock example.
  *
- * TODO : to property, hierarchy, entering(), exiting(), entered(), exited()
+ * TODO : improve substate doc
+ * TODO : implement exited() ?
  */
 
 class HKState : public QObject
@@ -31,28 +33,40 @@ class HKState : public QObject
     Q_OBJECT
 
 public:
-    explicit HKState(QObject *parent = 0);
-    virtual ~HKState();
+    explicit    HKState(QObject *parent = 0);
+    virtual     ~HKState();
 
-    void set(const QString & state);
-    bool is(const QString & state) const;
-    QString toString() const;
-    QString toDebugString() const;
+    void        set(const QString & state);
+    bool        is(const QString & state) const;
+
+    QString     toString() const;
+    QString     toDebugString() const;
 
 signals:
-    void changing(const QString & current, const QString & next);
-    void changed();
+    void        changing(const QString & current, const QString & next);
+    void        changed();
+
+protected:
+    void        setSubSeparator(const QChar & c);
+    QChar       subSeparator() const;
+
+    void        addSub(QObject * s, const QString & state = QString());
+    QObject *   sub(const QString & state);
+
+private:
+    void        setPath(const QString & state);
 };
 
+// state
 /**
-  * @def HK_STATE_ADD(Name)
+  * @def HK_ADD_STATE(Name)
   * Adds a state which includes:
   *   * Slot    -> void set...();   // sets state to this ...
   *   * Function-> void is...();    // to check if state is this ...
   *   * Signal  -> void at...();    // to inform after state is this ...
   *
   */
-#define HK_STATE_ADD(Name) \
+#define HK_ADD_STATE(Name) \
     public Q_SLOTS: \
         void set##Name() { set(#Name); emit at##Name(); } \
     public: \
@@ -61,11 +75,32 @@ signals:
         void at##Name()
 
 /**
-  * @def HK_STATE_SET_DEFAULT(Name)
+  * @def HK_SET_DEFAULT_STATE(Name)
   * Only calls setter of the given state (set...();).
   */
-#define HK_STATE_SET_DEFAULT(Name) \
+#define HK_SET_DEFAULT_STATE(Name) \
     set##Name()
+
+
+// TODO : check and test macros. improve doc
+
+// substate
+/**
+  * @def HK_ADD_SUB_TO_STATE(Sub, Parent)
+  */
+#define HK_ADD_SUB_TO_STATE(Sub, Parent) \
+    public Q_SLOTS: \
+    ##Sub * set##Sub() { emit at##Parent(); return get##Sub(); } \
+    public: \
+    ##Sub * get##Sub() { return qobject_cast<##Sub*>(sub(#Parent)); }
+
+/**
+  * @def HK_SET_SUB_TO_STATE(Sub, ToState)
+  * sets substate to state
+  */
+#define HK_SET_SUB_TO_STATE(Sub, ToState) \
+    setSub(new ##Sub(this), #ToState)
+
 
 
 #endif // HKSTATE_H

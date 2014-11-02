@@ -21,6 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_mode, SIGNAL(atMode12()), SLOT(atState()));
     connect(&m_mode, SIGNAL(atMode24()), SLOT(atState()));
 
+    // usage of substate signals
+    connect(m_alarm.getAlert(), SIGNAL(atAll()), SLOT(atState()));
+    connect(m_alarm.getAlert(), SIGNAL(atSound()), SLOT(atState()));
+    connect(m_alarm.getAlert(), SIGNAL(atVibration()), SLOT(atState()));
+
     // usage of changing signal
     connect(&m_alarm, SIGNAL(changing(QString,QString)),
             SLOT(stateChanging(QString,QString)));
@@ -40,6 +45,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // usage of setters as function call
     m_alarm.setOn();
     m_alarm.setOff();
+
+    // test substates
+    m_alarm.setAlert()->setAll();
+    m_alarm.setAlert()->setSound();
+    m_alarm.setAlert()->setVibration();
 
     m_mode.setMode12();
     m_mode.setMode24();
