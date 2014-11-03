@@ -81,21 +81,18 @@ void HKState::set(const QString &state)
     //     call roots func to set states through leaf.
 
     HKState * hks = NULL;
-    HKState * root = this;
     QObject * nextParent = this;
     QString path = state;
 
     while ( (hks = qobject_cast<HKState*>(nextParent)) != NULL) {
+        hks->setPath(path);
         QVariant v = hks->property(HK_PROPERTY_NAME_PARENT_STATE);
         if (v.isValid() && ( ! v.toString().isEmpty())) {
             path = v.toString() + sep + path;
         }
-        root = hks;
         nextParent = hks->parent();
     }
-    qDebug("set(%s) : path = %s", qPrintable(state), qPrintable(path));
-
-    root->setPath(path);
+//    qDebug("set(%s) : path = %s", qPrintable(state), qPrintable(path));
 }
 
 /**
